@@ -1,0 +1,24 @@
+import matplotlib.pyplot as plt
+import matplotlib.tri as tri
+import numpy as np
+# First have to give x and y coordinates of the points
+n_angles = 60
+n_radii = 14
+min_radius = 0.00
+radii = np.linspace(min_radius, 0.15, n_radii)
+angles = np.linspace(0, 4 * np.pi, n_angles, endpoint=False)
+angles = np.repeat(angles[..., np.newaxis], n_radii, axis=1)
+angles[:, 1::2] += np.pi/n_angles
+x = (radii * np.cos(angles)).flatten()
+y = (radii * np.sin(angles)).flatten()
+z = (np.cos(radii) * np.cos(3 * angles)).flatten()
+triang = tri.Triangulation(x, y)
+triang.set_mask(np.hypot(x[triang.triangles].mean(axis=1),
+                         y[triang.triangles].mean(axis=1))
+
+                < min_radius)
+fig1, ax1 = plt.subplots()
+ax1.set_aspect('equal')
+tpc = ax1.tripcolor(triang, z, shading='flat')
+fig1.colorbar(tpc)
+ax1.set_title('tripcolor of Delaunay triangulation,flat shading')
